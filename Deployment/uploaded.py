@@ -12,12 +12,10 @@ from pathlib import Path
 import cv2
 import depthai as dai
 
-from Deployment.wpi_helpers import ConfigParser, WPINetworkTables, ModelConfigParser, WPINetworkTables
+from wpi_helpers import ConfigParser, WPINetworkTables, WPINetworkTables
 
 '''
-Spatial Tiny-yolo example
-  Performs inference on RGB camera and retrieves spatial location 
-  coordinates: x,y,z relative to the center of depth map.
+Road Follow
   Detected objects are displayed to localhost:8091 
   
   The script uses the WPI Network Tables to send data back to the WPI program.
@@ -43,11 +41,8 @@ def parse_args():
         '-t', '--conf_thresh', type=float, default=0.3,
         help='set the detection confidence threshold')
     parser.add_argument(
-        '-m', '--model', type=str, required=True, default='simple_frozen_graph',
-        help=('[yolov3-tiny|yolov3|yolov3-spp|yolov4-tiny|yolov4|'
-              'yolov4-csp|yolov4x-mish|yolov4-p5]-[{dimension}], where '
-              '{dimension} could be either a single number (e.g. '
-              '288, 416, 608) or 2 numbers, WxH (e.g. 416x256)'))
+        '-m', '--model', type=str, required=False, default='simple_frozen_graph',
+        help=('The model that runs road following'))
     parser.add_argument(
         '-l', '--letter_box', action='store_true',
         help='inference with letterboxed image [False]')
@@ -105,7 +100,7 @@ def loop_and_detect(previewQueue, detectionNNQueue, networkTables, cvSource):
 
             # Put data to Network Tables
             if networkTables:
-                networkTables.put_spacial_data(steeringData)
+                networkTables.put_drive_data(steeringData)
         
         if cvSource is False:
             # Display stream to desktop window
@@ -160,7 +155,7 @@ def main(args, config_parser):
 
     # Properties
     frame_width = 200
-    frame_height = 66
+    frame_height = 200
     camRgb.setPreviewSize(frame_width, frame_height)
     camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
     camRgb.setInterleaved(False)
@@ -212,7 +207,7 @@ def main(args, config_parser):
 
 
 if __name__ == '__main__':
-    print("Running oak_yolo_spacial_wpi.py")
+    print("Running Road Following project")
     args = parse_args()
 
     # Load the FRC configuration file

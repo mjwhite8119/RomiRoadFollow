@@ -39,7 +39,7 @@ tf.io.write_graph(graph_or_graph_def=frozen_func.graph,
 blob_path = blobconverter.from_tf(
     frozen_pb="simple_frozen_graph.pb",
     data_type="FP16",
-    shaves=4,
+    shaves=6,
     optimizer_params=[
         "--reverse_input_channels",
         "--input_shape=[1,200,200,3]",

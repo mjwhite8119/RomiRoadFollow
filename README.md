@@ -39,6 +39,7 @@ This will create a `simple_model` folder in the Training directory together with
 
 which is the file that will be deployed to the Romi.  you can move to the project directory as:
 
+    cd ~/Documents/RomiRoadFollow/Deployment
     mv $HOME/.cache/blobconverter/simple_frozen_graph_openvino_2021.4_4shave.blob simple_frozen_graph.blob
 
 ## Step 3 - Deploy the Model on the Romi
