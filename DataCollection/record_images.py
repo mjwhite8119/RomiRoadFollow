@@ -4,7 +4,7 @@ import cv2
 import argparse
 import depthai as dai
 import img_helpers as img
-from wpi_helpers import ConfigParser, WPINetworkTables
+from Deployment.wpi_helpers import ConfigParser, WPINetworkTables
 
 def parse_args():
     """Parse input arguments."""

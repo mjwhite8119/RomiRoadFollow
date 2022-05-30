@@ -12,7 +12,7 @@ from pathlib import Path
 import cv2
 import depthai as dai
 
-from wpi_helpers import ConfigParser, WPINetworkTables, ModelConfigParser, WPINetworkTables
+from Deployment.wpi_helpers import ConfigParser, WPINetworkTables, ModelConfigParser, WPINetworkTables
 
 '''
 Spatial Tiny-yolo example
