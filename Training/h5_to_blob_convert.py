@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow.python.framework.convert_to_constants import convert_variables_to_constants_v2
+import blobconverter
 
 #### STEP 1 - Load the h5 model
 model = tf.keras.models.load_model('model.h5')
@@ -35,5 +36,14 @@ tf.io.write_graph(graph_or_graph_def=frozen_func.graph,
                     as_text=False)
 
 ### STEP 6 - Use blobconverter.luxonis.com to convert to blob
-# --input_shape=[1,66,200,3] must be specified in the blobconverter Advanced options 
-# which is on the right hand side of the page.
+blob_path = blobconverter.from_tf(
+    frozen_pb="simple_frozen_graph.pb",
+    data_type="FP16",
+    shaves=4,
+    optimizer_params=[
+        "--reverse_input_channels",
+        "--input_shape=[1,200,200,3]",
+        "--mean_values=[127.5,127.5,127.5]",
+        "--scale_values=[255,255,255]"
+    ],
+)

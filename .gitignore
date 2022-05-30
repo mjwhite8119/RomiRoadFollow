@@ -1,5 +1,7 @@
-/DataCollected
-/model
+/Training/DataCollected
+/Training/simple_model
+/Training/simple_frozen_graph.pb
+/Training/simple_frozen_graph.blob
 model.h5
 
 # Byte-compiled / optimized / DLL files
