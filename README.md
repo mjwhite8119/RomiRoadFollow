@@ -40,13 +40,13 @@ This will create a `simple_model` folder in the Training directory together with
 which is the file that will be deployed to the Romi.  you can move to the project directory as:
 
     cd ~/Documents/RomiRoadFollow/Deployment
-    mv $HOME/.cache/blobconverter/simple_frozen_graph_openvino_2021.4_4shave.blob simple_frozen_graph.blob
+    mv $HOME/.cache/blobconverter/simple_frozen_graph_openvino_2021.4_6shave.blob simple_frozen_graph.blob
 
 ## Step 3 - Deploy the Model on the Romi
 You're now ready to deploy this to the Romi. Start up the Romi, go to the Romi Web UI
 
 - Make the file system *Writable*.
-- Go to *Application Section -> File Upload* and upload the `.blob` file and the `wpi_helpers.py` file.
+- Go to *Application Section -> File Upload* and upload the `simple_frozen_graph.blob` file and the `wpi_helpers.py` file.
 - Go to *Application Section -> Application* and upload the `uploaded.py` file.
 - Go to the *Vision Status* and **Enable** the *Console Output*.
 - Click the *Up* button to start the road following application.
