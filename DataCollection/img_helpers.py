@@ -32,6 +32,13 @@ newPath = myDirectory +"/IMG"+str(countFolder)
 newFilename = "DataCollected/IMG"+str(countFolder)
 os.makedirs(newPath)
 
+# REMOVE THE DATA FOLDER
+def removeData():
+    try:
+        os.rmdir(myDirectory)
+    except OSError as e:
+        print("Error: %s : %s" % (myDirectory, e.strerror))
+
 # SAVE IMAGES IN THE FOLDER
 def saveData(img,speed, rotate):
     global imgList, speedList, rotateList

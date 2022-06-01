@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
+###########################################################
+# uploaded.py
+# This script collects images and steering data on the Romi
+###########################################################
 
 import cv2
 import argparse
+from DataCollection.img_helpers import removeData
 import depthai as dai
 import img_helpers as img
-from Deployment.wpi_helpers import ConfigParser, WPINetworkTables
+from wpi_helpers import ConfigParser, WPINetworkTables
 
 def parse_args():
     """Parse input arguments."""
@@ -70,19 +75,18 @@ def main(args, frc_config):
     # Connect to device and start pipeline
     with dai.Device(pipeline) as device:
 
-        video = device.getOutputQueue('video')
+        # video = device.getOutputQueue('video')
         preview = device.getOutputQueue('preview')
 
         try:
             while True:
-                videoFrame = video.get()
+                # videoFrame = video.get()
                 previewFrame = preview.get()
                 speed, rotate = networkTables.get_drive_data()
-                img.saveData(previewFrame.getFrame(), speed, rotate)
+                if speed > 0.01:
+                    # Only save data if the robot is moving
+                    img.saveData(previewFrame.getFrame(), speed, rotate)
 
-                # Get BGR frame from NV12 encoded video frame to show with opencv
-                # cv2.imshow("video", videoFrame.getCvFrame())
-                # Show 'preview' frame as is (already in correct format, no copy is made)
                 frame = previewFrame.getFrame()
                 if cvSource is False:
                     # Display stream to desktop window
@@ -107,5 +111,8 @@ if __name__ == '__main__':
 
     # Load the FRC configuration file
     frc_config = ConfigParser()
+
+    # Remove the old data
+    removeData()
 
     main(args, frc_config)               

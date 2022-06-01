@@ -9,6 +9,17 @@ The WPI Java program can be obtained from from the [RomiExamples](https://github
 
 ## Step 1 - Collect Data On the Romi
 
+#### Step 1.1 - Deploy the Data Collection Scripts
+To deploy the data collection scripts on the Romi:
+
+- Start up the Romi, go to the Romi Web UI
+- Make the file system *Writable*.
+- Go to *Application Section -> File Upload* and upload the `img_helpers.py` file.
+- Go to *Application Section -> Application* and select *Uploaded Python file*.
+- Upload the `uploaded.py` file.
+- Go to the *Vision Status* and **Enable** the *Console Output*.
+- Click the *Up* button to start the data collection application.
+
 #### Step 1.3 - Get data from the Raspberry Pi
 
 To get the data from the Raspberry Pi and place it into the project *Training* directory.  On the local PC:
@@ -47,13 +58,15 @@ You're now ready to deploy this to the Romi. Start up the Romi, go to the Romi W
 
 - Make the file system *Writable*.
 - Go to *Application Section -> File Upload* and upload the `simple_frozen_graph.blob` file and the `wpi_helpers.py` file.
-- Go to *Application Section -> Application* and upload the `uploaded.py` file.
+- Go to *Application Section -> Application* and select *Uploaded Python file*.
+- Upload the `uploaded.py` file.
 - Go to the *Vision Status* and **Enable** the *Console Output*.
 - Click the *Up* button to start the road following application.
 
 On your PC:
 
 - Start the *BasicML* WPI progam and select the Road Following command in the AutoChooser.
+- Put the robot into Automomous mode.
 
 ## Install Tensorflow on M1 Mac
 
