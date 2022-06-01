@@ -14,11 +14,7 @@ print(data.head())
 data = balanceData(data,display=True)
 
 # View each image
-# for i in range(0, len(data), 1):
-#     indexed_data = data.iloc[i]
-#     imagePath = os.path.join(path,indexed_data[0])
-#     label = np.array([indexed_data[1], indexed_data[2]])
-draw_image_with_label(path, data)
+# draw_image_with_label(path, data)
 
 #### STEP 3 - PREPARE FOR PROCESSING
 imagesPath, steerings = loadData(path,data)
