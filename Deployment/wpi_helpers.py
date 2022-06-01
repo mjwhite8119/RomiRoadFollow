@@ -188,10 +188,10 @@ class WPINetworkTables():
         self.hardware_entry = mlTable.getEntry("device")
         self.fps_entry = mlTable.getEntry("fps")
         self.resolution_entry = mlTable.getEntry("resolution")
-        self.detections_entry = mlTable.getEntry("detections")
+        # self.detections_entry = mlTable.getEntry("detections")
 
-        self.speedEntry = self.sd.getEntry("xaxisSpeed")
-        self.rotateEntry = self.sd.getEntry("zaxisRotate")
+        self.speedEntry = mlTable.getEntry("xaxisSpeed")
+        self.rotateEntry = mlTable.getEntry("zaxisRotate")
 
         # Put static data
         self.hardware_entry.setString(hardware_type)
@@ -235,6 +235,6 @@ class WPINetworkTables():
         self.entry.setString(json.dumps(temp_entry))    
 
     def put_drive_data(self, steering):
-        self.speedEntry.setNumber(5.0)
+        self.speedEntry.setNumber(0.5)
         self.rotateEntry.setNumber(steering)
             

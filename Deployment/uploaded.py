@@ -11,6 +11,7 @@ from pathlib import Path
 from pathlib import Path
 import cv2
 import depthai as dai
+import traceback
 
 from wpi_helpers import ConfigParser, WPINetworkTables, WPINetworkTables
 
@@ -94,13 +95,13 @@ def loop_and_detect(previewQueue, detectionNNQueue, networkTables, cvSource):
 
         # If the frame is available, add the steering angle
         if frame is not None:
-            cv2.putText(frame, f"{steeringData}", 
+            cv2.putText(frame, f"{steeringData[0]}", 
                 (2, frame.shape[0] - 4), 
                 cv2.FONT_HERSHEY_TRIPLEX, 0.5, color)
 
             # Put data to Network Tables
             if networkTables:
-                networkTables.put_drive_data(steeringData)
+                networkTables.put_drive_data(steeringData[0])
         
         if cvSource is False:
             # Display stream to desktop window
@@ -202,6 +203,7 @@ def main(args, config_parser):
                 loop_and_detect(previewQueue, detectionNNQueue, networkTables, cvSource=cvSource)
             except Exception as e:
                 print(e)
+                print(traceback.format_exc())
             finally:
                 print("Finished")         
 
