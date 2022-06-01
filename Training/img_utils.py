@@ -42,7 +42,7 @@ def importDataInfo(path):
 #### STEP 2 - VISUALIZE AND BALANCE DATA
 def balanceData(data,display=True):
     nBin = 31
-    samplesPerBin =  300
+    samplesPerBin =  50
     hist, bins = np.histogram(data['zaxisRotate'], nBin)
     if display:
         center = (bins[:-1] + bins[1:]) * 0.5
@@ -53,6 +53,7 @@ def balanceData(data,display=True):
         plt.ylabel('No of Samples')
         plt.show()
     removeindexList = []
+
     for j in range(nBin):
         binDataList = []
         for i in range(len(data['zaxisRotate'])):
@@ -77,6 +78,21 @@ def balanceData(data,display=True):
         plt.ylabel('No of Samples')
         plt.show()
     return data
+
+def draw_image_with_label(path, data):
+    for i in range(0, len(data), 1):
+        indexed_data = data.iloc[i]
+        imagePath = os.path.join(path,indexed_data[0])
+        label = np.array([indexed_data[1], indexed_data[2]])
+        color = (255, 255, 255)
+        print('Actual Steering Angle = {0}'.format(label))
+        print(imagePath)
+        img = mpimg.imread(imagePath)
+        cv2.putText(img, f"{label[1]}", 
+                    (2, img.shape[0] - 4), 
+                    cv2.FONT_HERSHEY_TRIPLEX, 0.5, color)
+        plt.imshow(img)
+        plt.show()
 
 #### STEP 3 - PREPARE FOR PROCESSING
 def loadData(path, data):
