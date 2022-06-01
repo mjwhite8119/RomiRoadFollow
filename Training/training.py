@@ -13,19 +13,26 @@ print(data.head())
 #### STEP 2 - VISUALIZE AND BALANCE DATA
 data = balanceData(data,display=True)
 
+# View each image
+# for i in range(0, len(data), 1):
+#     indexed_data = data.iloc[i]
+#     imagePath = os.path.join(path,indexed_data[0])
+#     label = np.array([indexed_data[1], indexed_data[2]])
+draw_image_with_label(path, data)
+
 #### STEP 3 - PREPARE FOR PROCESSING
 imagesPath, steerings = loadData(path,data)
-# dataset = XYDataset(data, random_hflips=False)
 print('Number of Path Created for Images ',len(imagesPath),len(steerings))
-# cv2.imshow('Test Image',cv2.imread(imagesPath[5]))
+
 # cv2.waitKey(0)
-print(steerings[0])
+# print(steerings[0])
 
 #### STEP 4 - SPLIT FOR TRAINING AND VALIDATION
 xTrain, xVal, yTrain, yVal = train_test_split(imagesPath, steerings,
                                               test_size=0.2,random_state=10)
 print('Total Training Images: ',len(xTrain))
 print('Total Validation Images: ',len(xVal))
+
 #### STEP 5 - AUGMENT DATA
 
 #### STEP 6 - PREPROCESS

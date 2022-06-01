@@ -57,3 +57,6 @@ You're now ready to deploy this to the Romi.  Start up the Romi and go to the UI
 
     python3 -m pip install -r requirements.txt
 
+## Referencies
+
+- [Frozen graph format how-to](https://leimao.github.io/blog/Save-Load-Inference-From-TF2-Frozen-Graph/)
