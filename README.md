@@ -25,7 +25,7 @@ To deploy the data collection scripts on the Romi:
 To get the data from the Raspberry Pi and place it into the project *Training* directory.  On the local PC:
 
     cd ~/Documents/RomiRoadFollow/Training
-    scp pi@10.0.0.2:~/FRC-OAK-Deployment-Models/DataCollected .
+    scp -r pi@10.0.0.2:~/DataCollected .
 
 ## Step 2 - Train the Model
 The step involves training the model and converting it for use on the OAK-D camera device.
