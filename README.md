@@ -79,6 +79,11 @@ On your PC:
 
     python3 -m pip install -r requirements.txt
 
+Tensorboard needs a lower version of markdown, therefore:
+
+    pip uninstall markdown
+    pip install markdown==3.1.1
+
 ## Referencies
 
 - [Frozen graph format how-to](https://leimao.github.io/blog/Save-Load-Inference-From-TF2-Frozen-Graph/)

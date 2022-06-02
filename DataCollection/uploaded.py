@@ -76,8 +76,9 @@ def main(args, frc_config):
 
         video = device.getOutputQueue('video')
         preview = device.getOutputQueue('preview')
-        logOnce = True
-        logMessage = "Waiting for input"
+        waitOnce = True
+        haveData = False
+        waitMessage = "Waiting for Input..."
 
         try:
             while True:
@@ -87,9 +88,18 @@ def main(args, frc_config):
                 if speed > 0.3:
                     # Only save data if the robot is moving
                     img.saveData(previewFrame.getFrame(), speed, rotate)
-                elif logOnce:
-                    print(logMessage)  
-                    logOnce = False  
+                    haveData = True
+                    
+                elif speed < 0.1 and haveData:
+                    # Robot stopped moving so 
+                    print("Saving log file")  
+                    img.saveLog()  
+                    haveData = False 
+                    waitOnce = True
+
+                elif waitOnce:
+                    print(waitMessage)  
+                    waitOnce = False  
 
                 frame = previewFrame.getFrame()
                 if cvSource is False:

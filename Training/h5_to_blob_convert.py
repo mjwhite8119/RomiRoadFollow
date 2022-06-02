@@ -1,6 +1,8 @@
 import tensorflow as tf
 from tensorflow.python.framework.convert_to_constants import convert_variables_to_constants_v2
 import blobconverter
+import os
+import shutil
 
 #### STEP 1 - Load the h5 model
 model = tf.keras.models.load_model('model.h5')
@@ -36,6 +38,7 @@ tf.io.write_graph(graph_or_graph_def=frozen_func.graph,
                     as_text=False)
 
 ### STEP 6 - Use blobconverter.luxonis.com to convert to blob
+blobPath = os.path.join(os.getcwd(), 'blob')
 blob_path = blobconverter.from_tf(
     frozen_pb="simple_frozen_graph.pb",
     data_type="FP16",
@@ -47,3 +50,9 @@ blob_path = blobconverter.from_tf(
         "--scale_values=[255,255,255]"
     ],
 )
+
+home = os.path.expanduser('~')
+sourceFile = f"{home}/.cache/blobconverter/simple_frozen_graph_openvino_2021.4_6shave.blob"
+print(sourceFile)
+destinationFile = "simple_frozen_graph.blob"
+shutil.move(sourceFile, destinationFile)

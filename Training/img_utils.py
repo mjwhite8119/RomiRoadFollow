@@ -79,6 +79,12 @@ def balanceData(data,display=True):
         plt.show()
     return data
 
+def on_press(event):
+    print('press', event.key)
+    sys.stdout.flush()
+    if event.key == 'x':
+        print("Image deleted")
+
 def draw_image_with_label(path, data):
     for i in range(0, len(data), 1):
         indexed_data = data.iloc[i]
@@ -87,10 +93,13 @@ def draw_image_with_label(path, data):
         color = (255, 255, 255)
         print('Actual Steering Angle = {0}'.format(label))
         print(imagePath)
-        img = mpimg.imread(imagePath)
+        # img = mpimg.imread(imagePath)
+        img, steering = augmentImage(imagePath, label)
+        img = preProcess(img)
         cv2.putText(img, f"{label[1]}", 
                     (2, img.shape[0] - 4), 
                     cv2.FONT_HERSHEY_TRIPLEX, 0.5, color)
+        # fig.canvas.mpl_connect('key_press_event', on_press)            
         plt.imshow(img)
         plt.show()
 
@@ -111,8 +120,8 @@ def saveBalancedData(path, data):
                 'speed': speedList,
                 'rotate': rotateList}
     df = pd.DataFrame(rawData)
-    df.to_csv(os.path.join(myDirectory,f'log_{str(countFolder)}.csv'), index=False, header=False)
-    print('Log Saved')
+    df.to_csv(os.path.join("BalancedData",f'log_{str(0)}.csv'), index=False, header=False)
+    print('Balanced Data Saved')
     print('Total Images: ',len(imgList))        
 
 #### STEP 3 - PREPARE FOR PROCESSING
@@ -152,7 +161,7 @@ def augmentImage(imgPath,steering):
 
 #### STEP 6 - PREPROCESS
 def preProcess(img):
-    img = img[54:120,:,:]
+    # img = img[54:120,:,:]
     img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
     img = cv2.GaussianBlur(img,  (3, 3), 0)
     img = cv2.resize(img, (200, 200))

@@ -1,8 +1,13 @@
 print('Setting UP')
 import os
+from cv2 import log
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from sklearn.model_selection import train_test_split
 from img_utils import *
+import tensorflow as tf
+# from tensorflow.keras.callbacks import CSVLogger
+import threading
+import shutil
 
 #### STEP 1 - INITIALIZE DATA
 path = 'DataCollected'
@@ -37,14 +42,40 @@ print('Total Validation Images: ',len(xVal))
 model = createModel()
 model.summary()
 
-#### STEP 8 - TRAINNING
+#### STEP 8 - LAUNCH TENSORBOARD
+logPath = os.path.join(os.getcwd(), 'tflog')
+print(logPath)
+
+# Clear any logs from previous runs
+try:
+    print(f"Removing Tensorboard log directory {logPath}")
+    shutil.rmtree(logPath)
+except OSError as e:
+    print("Error: %s : %s" % (logPath, e.strerror))
+
+def launchTensorBoard():
+    import os
+    os.system('tensorboard --logdir=' + logPath)
+    return
+
+t = threading.Thread(target=launchTensorBoard, args=([]))
+t.start()
+
+#Allow TensorBoard callbacks
+BATCH_SIZE = 50
+tensorboard_callback = tf.keras.callbacks.TensorBoard(logPath,
+                                                      histogram_freq=1,
+                                                      write_graph=True,
+                                                      write_images=True)
+#### STEP 9 - TRAINNING
 history = model.fit(dataGen(xTrain, yTrain, 100, 1),
                             steps_per_epoch=100,
                             epochs=10,
-                            validation_data=dataGen(xVal, yVal, 50, 0),
-                            validation_steps=50)
+                            validation_data=dataGen(xVal, yVal, BATCH_SIZE, 0),
+                            validation_steps=50,
+                            callbacks=[tensorboard_callback])
 
-#### STEP 9 - SAVE THE KERAS H5 MODEL
+#### STEP 10 - SAVE THE KERAS H5 MODEL
 model.save('model.h5')
 print('Model Saved')
 
