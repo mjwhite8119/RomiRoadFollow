@@ -94,6 +94,27 @@ def draw_image_with_label(path, data):
         plt.imshow(img)
         plt.show()
 
+def saveBalancedData(path, data):
+    imgList = []
+    speedList = []
+    rotateList = []
+    for i in range(0, len(data), 1):
+        indexed_data = data.iloc[i]
+        imagePath = os.path.join(path,indexed_data[0])
+        speed = np.array([indexed_data[1], indexed_data[1]])
+        rotate = np.array([indexed_data[1], indexed_data[2]])
+        imgList.append(imagePath)
+        speedList.append(speed)
+        rotateList.append(rotate)
+        
+    rawData = {'Image': imgList,
+                'speed': speedList,
+                'rotate': rotateList}
+    df = pd.DataFrame(rawData)
+    df.to_csv(os.path.join(myDirectory,f'log_{str(countFolder)}.csv'), index=False, header=False)
+    print('Log Saved')
+    print('Total Images: ',len(imgList))        
+
 #### STEP 3 - PREPARE FOR PROCESSING
 def loadData(path, data):
   imagesPath = []
