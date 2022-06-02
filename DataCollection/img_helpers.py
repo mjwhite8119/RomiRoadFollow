@@ -13,6 +13,7 @@ import pandas as pd
 import os
 import cv2
 from datetime import datetime
+import shutil
 
 global imgList, speedList
 countFolder = 0
@@ -23,9 +24,15 @@ rotateList = []
 
 #GET CURRENT DIRECTORY PATH
 myDirectory = os.path.join(os.getcwd(), 'DataCollected')
-# print(myDirectory)
+print(myDirectory)
 
 # CREATE A NEW FOLDER BASED ON THE PREVIOUS FOLDER COUNT
+try:
+    print(f"Removing directory {myDirectory}")
+    shutil.rmtree(myDirectory)
+except OSError as e:
+    print("Error: %s : %s" % (myDirectory, e.strerror))
+
 while os.path.exists(os.path.join(myDirectory,f'IMG{str(countFolder)}')):
         countFolder += 1
 newPath = myDirectory +"/IMG"+str(countFolder)
@@ -33,11 +40,12 @@ newFilename = "DataCollected/IMG"+str(countFolder)
 os.makedirs(newPath)
 
 # REMOVE THE DATA FOLDER
-def removeData():
-    try:
-        os.rmdir(myDirectory)
-    except OSError as e:
-        print("Error: %s : %s" % (myDirectory, e.strerror))
+# def removeData():
+#     try:
+#         print(f"Removing directory {myDirectory}")
+#         shutil.rmtree(myDirectory)
+#     except OSError as e:
+#         print("Error: %s : %s" % (myDirectory, e.strerror))
 
 # SAVE IMAGES IN THE FOLDER
 def saveData(img,speed, rotate):
