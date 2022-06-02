@@ -6,9 +6,8 @@
 
 import cv2
 import argparse
-from DataCollection.img_helpers import removeData
-import depthai as dai
 import img_helpers as img
+import depthai as dai
 from wpi_helpers import ConfigParser, WPINetworkTables
 
 def parse_args():
@@ -75,17 +74,22 @@ def main(args, frc_config):
     # Connect to device and start pipeline
     with dai.Device(pipeline) as device:
 
-        # video = device.getOutputQueue('video')
+        video = device.getOutputQueue('video')
         preview = device.getOutputQueue('preview')
+        logOnce = True
+        logMessage = "Waiting for input"
 
         try:
             while True:
-                # videoFrame = video.get()
+                videoFrame = video.get()
                 previewFrame = preview.get()
                 speed, rotate = networkTables.get_drive_data()
-                if speed > 0.01:
+                if speed > 0.3:
                     # Only save data if the robot is moving
                     img.saveData(previewFrame.getFrame(), speed, rotate)
+                elif logOnce:
+                    print(logMessage)  
+                    logOnce = False  
 
                 frame = previewFrame.getFrame()
                 if cvSource is False:
@@ -111,8 +115,5 @@ if __name__ == '__main__':
 
     # Load the FRC configuration file
     frc_config = ConfigParser()
-
-    # Remove the old data
-    removeData()
 
     main(args, frc_config)               
