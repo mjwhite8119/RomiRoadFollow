@@ -1,13 +1,12 @@
 print('Setting UP')
 import os
+from tabnanny import verbose
 from cv2 import log
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 from sklearn.model_selection import train_test_split
 from img_utils import *
 import tensorflow as tf
-# from tensorflow.keras.callbacks import CSVLogger
-import threading
-import shutil
+from tensorboard_utils import *
 
 #### STEP 1 - INITIALIZE DATA
 path = 'DataCollected'
@@ -25,9 +24,6 @@ data = balanceData(data,display=True)
 imagesPath, steerings = loadData(path,data)
 print('Number of Path Created for Images ',len(imagesPath),len(steerings))
 
-# cv2.waitKey(0)
-# print(steerings[0])
-
 #### STEP 4 - SPLIT FOR TRAINING AND VALIDATION
 xTrain, xVal, yTrain, yVal = train_test_split(imagesPath, steerings,
                                               test_size=0.2,random_state=10)
@@ -43,37 +39,19 @@ model = createModel()
 model.summary()
 
 #### STEP 8 - LAUNCH TENSORBOARD
+batch_size = 100
 logPath = os.path.join(os.getcwd(), 'tflog')
-print(logPath)
+tensorboard_callback = startTensorBoard(logPath)   
 
-# Clear any logs from previous runs
-try:
-    print(f"Removing Tensorboard log directory {logPath}")
-    shutil.rmtree(logPath)
-except OSError as e:
-    print("Error: %s : %s" % (logPath, e.strerror))
-
-def launchTensorBoard():
-    import os
-    os.system('tensorboard --logdir=' + logPath)
-    return
-
-t = threading.Thread(target=launchTensorBoard, args=([]))
-t.start()
-
-#Allow TensorBoard callbacks
-BATCH_SIZE = 50
-tensorboard_callback = tf.keras.callbacks.TensorBoard(logPath,
-                                                      histogram_freq=1,
-                                                      write_graph=True,
-                                                      write_images=True)
 #### STEP 9 - TRAINNING
+BATCH_SIZE = 50
 history = model.fit(dataGen(xTrain, yTrain, 100, 1),
                             steps_per_epoch=100,
                             epochs=10,
                             validation_data=dataGen(xVal, yVal, BATCH_SIZE, 0),
                             validation_steps=50,
-                            callbacks=[tensorboard_callback])
+                            callbacks=[tensorboard_callback],
+                            verbose=2)
 
 #### STEP 10 - SAVE THE KERAS H5 MODEL
 model.save('model.h5')

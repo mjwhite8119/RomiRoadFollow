@@ -42,7 +42,8 @@ def importDataInfo(path):
 #### STEP 2 - VISUALIZE AND BALANCE DATA
 def balanceData(data,display=True):
     nBin = 31
-    samplesPerBin =  50
+    samplesPerBin = 300
+    samplesPerCenterBin = 100
     hist, bins = np.histogram(data['zaxisRotate'], nBin)
     if display:
         center = (bins[:-1] + bins[1:]) * 0.5
@@ -58,12 +59,13 @@ def balanceData(data,display=True):
         binDataList = []
         for i in range(len(data['zaxisRotate'])):
             zaxis = data['zaxisRotate'][i]
-            xaxis = data['xaxisSpeed'][i]
-            # Balance data and only use images where robot is moving
-            if zaxis >= bins[j] and zaxis <= bins[j + 1] or xaxis < 0.4:
-                binDataList.append(i)
+            if zaxis >= bins[j] and zaxis <= bins[j + 1]:
+                binDataList.append(i)  
         binDataList = shuffle(binDataList)
-        binDataList = binDataList[samplesPerBin:]
+        if j in range(14,16):
+            binDataList = binDataList[samplesPerCenterBin:]
+        else:
+            binDataList = binDataList[samplesPerBin:]
         removeindexList.extend(binDataList)
 
     print('Removed Images:', len(removeindexList))
@@ -190,7 +192,7 @@ def createModel():
     model.add(Dense(1))
 
     # Compile model with optimizer
-    model.compile(Adam(lr=0.0001),loss='mse')
+    model.compile(Adam(learning_rate=0.0001),loss='mse')
     return model
 
 #### STEP 8 - TRAINNING

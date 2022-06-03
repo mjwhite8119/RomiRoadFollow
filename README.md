@@ -84,6 +84,30 @@ Tensorboard needs a lower version of markdown, therefore:
     pip uninstall markdown
     pip install markdown==3.1.1
 
+
+### LabelImg Install
+Using Conda. Create a virtual environment in conda and activate it:
+
+    conda create -n venv
+    conda activate venv
+Install pyqt using conda:
+
+    conda install pyqt
+Install lxml using pip:
+
+    pip install lxml
+
+Clone labelImg:
+
+    git clone https://github.com/tzutalin/labelImg.git   
+    cd labelImg
+    make qt5py3
+
+Run LabelImg:
+
+    python labelImg.py
+
+
 ## Referencies
 
 - [Frozen graph format how-to](https://leimao.github.io/blog/Save-Load-Inference-From-TF2-Frozen-Graph/)
