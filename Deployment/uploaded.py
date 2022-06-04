@@ -153,7 +153,6 @@ def main(args, config_parser):
     xoutRgb.setStreamName("rgb")
     xoutNN.setStreamName("detections")
 
-
     # Properties
     frame_width = 200
     frame_height = 200

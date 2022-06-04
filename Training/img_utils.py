@@ -145,9 +145,9 @@ def augmentImage(imgPath,steering):
     if np.random.rand() < 0.5:
         pan = iaa.Affine(translate_percent={"x": (-0.1, 0.1), "y": (-0.1, 0.1)})
         img = pan.augment_image(img)
-    if np.random.rand() < 0.5:
-        zoom = iaa.Affine(scale=(1, 1.2))
-        img = zoom.augment_image(img)
+    # if np.random.rand() < 0.5:
+    #     zoom = iaa.Affine(scale=(1, 1.2))
+    #     img = zoom.augment_image(img)
     if np.random.rand() < 0.5:
         brightness = iaa.Multiply((0.5, 1.2))
         img = brightness.augment_image(img)
@@ -164,8 +164,8 @@ def augmentImage(imgPath,steering):
 #### STEP 6 - PREPROCESS
 def preProcess(img):
     # img = img[54:120,:,:]
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2YUV)
-    img = cv2.GaussianBlur(img,  (3, 3), 0)
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    # img = cv2.GaussianBlur(img,  (3, 3), 0)
     img = cv2.resize(img, (200, 200))
     img = img/255
     return img
@@ -195,7 +195,7 @@ def createModel():
     model.compile(Adam(learning_rate=0.0001),loss='mse')
     return model
 
-#### STEP 8 - TRAINNING
+#### TRAINING
 def dataGen(imagesPath, steeringList, batchSize, trainFlag):
     while True:
         imgBatch = []
@@ -210,5 +210,23 @@ def dataGen(imagesPath, steeringList, batchSize, trainFlag):
                 steering = steeringList[index][1]
             img = preProcess(img)
             imgBatch.append(img)
+            steeringBatch.append(steering)
+        yield (np.asarray(imgBatch),np.asarray(steeringBatch))
+
+#### VALIDATION
+def dataPredict(imagesPath, model, batchSize):
+    while True:
+        imgBatch = []
+        steeringBatch = []
+
+        for i in range(batchSize):
+            index = random.randint(0, len(imagesPath) - 1)
+            img = mpimg.imread(imagesPath[index])
+            img = preProcess(img)
+            imgBatch.append(img)
+
+            # predict the steering value
+            img = np.array([img])
+            steering = float(model.predict(img))           
             steeringBatch.append(steering)
         yield (np.asarray(imgBatch),np.asarray(steeringBatch))

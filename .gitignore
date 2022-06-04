@@ -4,7 +4,7 @@
 /Training/simple_frozen_graph.blob
 /Deployment/simple_frozen_graph.blob
 model.h5
-/Training/tflog/
+/Training/tflog*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

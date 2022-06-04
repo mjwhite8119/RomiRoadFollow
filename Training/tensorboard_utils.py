@@ -63,10 +63,13 @@ def my_image_grid(data, labels):
     figure = plt.figure(figsize=(20, 20))
     num_images = data.shape[0]
     size = int(np.ceil(np.sqrt(num_images)))
-    color = (255, 255, 255)
+    color = (255, 0, 0)
 
     for i in range(data.shape[0]):
-        label=round(labels[i][1],2)
+        try:
+            label=round(labels[i][1],2)
+        except:
+            label=round(labels[i],2)    
         plt.subplot(size, size, i + 1)
         plt.xticks([])
         plt.yticks([])
