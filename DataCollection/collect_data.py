@@ -40,21 +40,20 @@ def main(args, frc_config):
 
     # Define source and outputs
     camRgb = pipeline.create(dai.node.ColorCamera)
-    xoutVideo = pipeline.create(dai.node.XLinkOut)
+    # xoutVideo = pipeline.create(dai.node.XLinkOut)
     xoutPreview = pipeline.create(dai.node.XLinkOut)
-
-    xoutVideo.setStreamName("video")
+    # xoutVideo.setStreamName("video")
     xoutPreview.setStreamName("preview")
 
     # Properties
-    camRgb.setPreviewSize(300, 300)
+    camRgb.setPreviewSize(200, 200)
     camRgb.setBoardSocket(dai.CameraBoardSocket.RGB)
     camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-    camRgb.setInterleaved(True)
-    camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
+    camRgb.setInterleaved(False)
+    camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.RGB)
 
     # Linking
-    camRgb.video.link(xoutVideo.input)
+    # camRgb.video.link(xoutVideo.input)
     camRgb.preview.link(xoutPreview.input)
 
     # Start the mjpeg server (default)
@@ -74,7 +73,7 @@ def main(args, frc_config):
     # Connect to device and start pipeline
     with dai.Device(pipeline) as device:
 
-        video = device.getOutputQueue('video')
+        # video = device.getOutputQueue('video')
         preview = device.getOutputQueue('preview')
         waitOnce = True
         haveData = False
@@ -82,7 +81,7 @@ def main(args, frc_config):
 
         try:
             while True:
-                videoFrame = video.get()
+                # videoFrame = video.get()
                 previewFrame = preview.get()
                 speed, rotate = networkTables.get_drive_data()
                 if speed > 0.3:

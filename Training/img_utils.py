@@ -4,12 +4,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.utils import shuffle
 import cv2
-import glob
-import PIL.Image
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Convolution2D,Flatten,Dense
-from tensorflow.keras.optimizers import Adam, SGD
+from tensorflow.keras.models import Sequential, Model
+from tensorflow.keras.layers import Convolution2D,Flatten,Dense,Conv2D,MaxPooling2D, Dropout,Input, concatenate
+from tensorflow.keras.optimizers import Adam, Nadam
 
 import matplotlib.image as mpimg
 from imgaug import augmenters as iaa
@@ -138,45 +136,9 @@ def loadData(path, data):
   steerings = np.asarray(steerings)
   return imagesPath, steerings
 
-
-#### STEP 5 - AUGMENT DATA
-def augmentImage(imgPath,steering):
-    img =  mpimg.imread(imgPath)
-    if np.random.rand() < 0.5:
-        pan = iaa.Affine(translate_percent={"x": (-0.1, 0.1), "y": (-0.1, 0.1)})
-        img = pan.augment_image(img)
-    # if np.random.rand() < 0.5:
-    #     zoom = iaa.Affine(scale=(1, 1.2))
-    #     img = zoom.augment_image(img)
-    if np.random.rand() < 0.5:
-        brightness = iaa.Multiply((0.5, 1.2))
-        img = brightness.augment_image(img)
-    # if np.random.rand() < 0.5:
-    #     img = cv2.flip(img, 1)
-    #     steering = steering[0][1] * -1
-    return img, steering
-
-# imgRe,st = augmentImage('DataCollected/IMG18/Image_1601839810289305.jpg',0)
-# #mpimg.imsave('Result.jpg',imgRe)
-# plt.imshow(imgRe)
-# plt.show()
-
-#### STEP 6 - PREPROCESS
-def preProcess(img):
-    # img = img[54:120,:,:]
-    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
-    # img = cv2.GaussianBlur(img,  (3, 3), 0)
-    img = cv2.resize(img, (200, 200))
-    img = img/255
-    return img
-
-# imgRe = preProcess(mpimg.imread('DataCollected/IMG18/Image_1601839810289305.jpg'))
-# # mpimg.imsave('Result.jpg',imgRe)
-# plt.imshow(imgRe)
-# plt.show()
-
-#### STEP 7 - CREATE MODEL
+#### CREATE MODEL
 def createModel():
+    # Use elu instead of relu to allow negative values.
     model = Sequential()
 
     model.add(Convolution2D(24, (5, 5), (2, 2), input_shape=(200, 200, 3), activation='elu'))
@@ -194,6 +156,93 @@ def createModel():
     # Compile model with optimizer
     model.compile(Adam(learning_rate=0.0001),loss='mse')
     return model
+
+def createModelFunctional(img):
+    # image_input_shape = img.shape
+    
+    image_input_shape = (200, 200, 3)
+    img_input = Input(shape=image_input_shape)
+    kernel_size = (5, 5)
+    strides = (2, 2)
+
+    x = Conv2D(24, kernel_size, strides, name="conv0", activation='elu')(img_input)
+    x = Conv2D(36, kernel_size, strides, name="conv1", activation='elu')(x)
+    x = Conv2D(48, kernel_size, strides, name="conv2", activation='elu')(x)
+    x = Conv2D(64, (3, 3), name="conv3", activation='elu')(x)
+    x = Conv2D(64, (3, 3), name="conv4", activation='elu')(x)
+    x = Flatten()(x)
+    x = Dense(100, activation='elu', name='dense0')(x)
+    x = Dense(50, activation='elu', name='dense1')(x)
+    x = Dense(10, activation='elu', name='dense2')(x)
+    x = Dense(1, name='output')(x)
+
+    # Compile model with optimizer
+    adam = Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+    model = Model(inputs=[img_input], outputs=x)
+    model.compile(optimizer=adam, loss='mse')
+    return model
+
+
+### EXPERIMENTAL MODEL WITH MULTIPLE INPUTS
+def createRFModel(xTrain):
+    # This one is more advanced and requires a second input of drive parameters
+    image_input_shape = xTrain[0].shape[1:]
+    state_input_shape = xTrain[1].shape[1:]
+    activation = 'relu'
+
+    #Create the convolutional stacks
+    pic_input = Input(shape=image_input_shape)
+
+    x = Conv2D(16, (3, 3), name="convolution0", padding='same', activation=activation)(pic_input)
+    x = MaxPooling2D(pool_size=(2,2))(x)
+    x = Conv2D(32, (3, 3), activation=activation, padding='same', name='convolution1')(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Conv2D(32, (3, 3), activation=activation, padding='same', name='convolution2')(x)
+    x = MaxPooling2D(pool_size=(2, 2))(x)
+    x = Flatten()(x)
+    x = Dropout(0.2)(x)
+
+    #Inject the state input
+    state_input = Input(shape=state_input_shape)
+    merged = concatenate([x, state_input])
+
+    # Add a few dense layers to finish the model
+    merged = Dense(64, activation=activation, name='dense0')(merged)
+    merged = Dropout(0.2)(merged)
+    merged = Dense(10, activation=activation, name='dense2')(merged)
+    merged = Dropout(0.2)(merged)
+    merged = Dense(1, name='output')(merged)
+
+    adam = Nadam(lr=0.0001, beta_1=0.9, beta_2=0.999, epsilon=1e-08)
+    model = Model(inputs=[pic_input, state_input], outputs=merged)
+    model.compile(optimizer=adam, loss='mse')
+    return model
+
+#### AUGMENT DATA
+def augmentImage(imgPath,steering):
+    img =  mpimg.imread(imgPath)
+    if np.random.rand() < 0.5:
+        pan = iaa.Affine(translate_percent={"x": (-0.1, 0.1), "y": (-0.1, 0.1)})
+        img = pan.augment_image(img)
+    # if np.random.rand() < 0.5:
+    #     zoom = iaa.Affine(scale=(1, 1.2))
+    #     img = zoom.augment_image(img)
+    if np.random.rand() < 0.5:
+        brightness = iaa.Multiply((0.5, 1.2))
+        img = brightness.augment_image(img)
+    # if np.random.rand() < 0.5:
+    #     img = cv2.flip(img, 1)
+    #     steering = steering[0][1] * -1
+    return img, steering
+
+#### PREPROCESS
+def preProcess(img):
+    # img = img[54:120,:,:]
+    # img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+    # img = cv2.GaussianBlur(img,  (3, 3), 0)
+    img = cv2.resize(img, (200, 200))
+    img = img/255.0
+    return img
 
 #### TRAINING
 def dataGen(imagesPath, steeringList, batchSize, trainFlag):

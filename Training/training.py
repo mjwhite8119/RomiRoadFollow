@@ -8,6 +8,8 @@ from img_utils import *
 import tensorflow as tf
 from tensorboard_utils import *
 
+AUTOTUNE = tf.data.experimental.AUTOTUNE
+
 #### STEP 1 - INITIALIZE DATA
 path = 'DataCollected'
 data = importDataInfo(path)
@@ -35,7 +37,16 @@ print('Total Validation Images: ',len(xVal))
 #### STEP 6 - PREPROCESS
 
 #### STEP 7 - CREATE MODEL
-model = createModel()
+
+# Read the actual image
+indexed_data = data.iloc[0]
+imagePath = os.path.join(path,indexed_data[0])
+img =  mpimg.imread(imagePath)
+img = preProcess(img)
+
+# Use it for the model input shape
+model = createModelFunctional(img)
+# model = createRFModel(xTrain)
 model.summary()
 
 #### STEP 8 - LAUNCH TENSORBOARD
@@ -44,12 +55,15 @@ logPath = os.path.join(os.getcwd(), 'tflog')
 tensorboard_callback = startTensorBoard(logPath)   
 
 #### STEP 9 - TRAINNING
-BATCH_SIZE = 50
-history = model.fit(dataGen(xTrain, yTrain, 100, 1),
-                            steps_per_epoch=100,
+training_batch_size = 100
+validation_batch_size = 50
+trainSteps = int(len(xTrain) / training_batch_size) + 1
+valSteps = int(len(xVal) / validation_batch_size) + 1
+history = model.fit(dataGen(xTrain, yTrain, training_batch_size, 1),
+                            steps_per_epoch=trainSteps,
                             epochs=10,
-                            validation_data=dataGen(xVal, yVal, BATCH_SIZE, 0),
-                            validation_steps=50,
+                            validation_data=dataGen(xVal, yVal, validation_batch_size, 0),
+                            validation_steps=valSteps,
                             callbacks=[tensorboard_callback],
                             verbose=2)
 
@@ -58,9 +72,9 @@ model.save('model.h5')
 print('Model Saved')
 
 #### STEP 11 - PLOT THE RESULTS
-plt.plot(history.history['loss'])
-plt.plot(history.history['val_loss'])
-plt.legend(['Training', 'Validation'])
-plt.title('Loss')
-plt.xlabel('Epoch')
-plt.show()
+# plt.plot(history.history['loss'])
+# plt.plot(history.history['val_loss'])
+# plt.legend(['Training', 'Validation'])
+# plt.title('Loss')
+# plt.xlabel('Epoch')
+# plt.show()

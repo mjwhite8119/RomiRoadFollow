@@ -68,7 +68,7 @@ def loop_and_detect(previewQueue, detectionNNQueue, networkTables, cvSource):
     startTime = time.monotonic()
     counter = 0
     fps = 0
-    color = (255, 255, 255)
+    color = (0, 0, 255)
 
     # Run detection loop
     while True:
@@ -89,19 +89,21 @@ def loop_and_detect(previewQueue, detectionNNQueue, networkTables, cvSource):
             #     cv2.FONT_HERSHEY_TRIPLEX, 0.4, color)
 
         if inDet is not None:
-            # print(inDet.getAllLayerNames())
-            steeringData = inDet.getLayerFp16("sequential/dense_3/BiasAdd/Add")
+            print(inDet.getAllLayerNames())
+            print(inDet.getLayerDataType("model/output/BiasAdd/Add"))
+            steeringData = inDet.getLayerFp16("model/output/BiasAdd/Add")
+            xaxisRotate = round(steeringData[0], 2) * 2
             counter += 1
 
         # If the frame is available, add the steering angle
         if frame is not None:
-            cv2.putText(frame, f"{steeringData[0]}", 
+            cv2.putText(frame, f"{xaxisRotate}", 
                 (2, frame.shape[0] - 4), 
                 cv2.FONT_HERSHEY_TRIPLEX, 0.5, color)
 
             # Put data to Network Tables
             if networkTables:
-                networkTables.put_drive_data(steeringData[0])
+                networkTables.put_drive_data(xaxisRotate)
         
         if cvSource is False:
             # Display stream to desktop window
@@ -159,7 +161,13 @@ def main(args, config_parser):
     camRgb.setPreviewSize(frame_width, frame_height)
     camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
     camRgb.setInterleaved(False)
-    camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.BGR)
+    camRgb.setBoardSocket(dai.CameraBoardSocket.RGB)
+    camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.RGB)
+
+    # Image manipulation
+    manip = pipeline.createImageManip()
+    manip.initialConfig.setResize(frame_width, frame_height)
+    manip.initialConfig.setKeepAspectRatio(False)
 
     # Setting node configs
     nn.setBlobPath(nnPath)
@@ -167,6 +175,8 @@ def main(args, config_parser):
     nn.input.setBlocking(False)
 
     # Linking
+    # camRgb.preview.link(manip.inputImage)
+    # manip.out.link(nn.input)
     camRgb.preview.link(nn.input)
     if syncNN:
         nn.passthrough.link(xoutRgb.input)
