@@ -19,7 +19,4 @@ This will create a `simple_model` folder in the Training directory together with
 
     $HOME/.cache/blobconverter/simple_frozen_graph_openvino_2021.4_4shave.blob
 
-which is the file that will be deployed to the Romi.  you can move to the project directory as:
-
-    cd ~/Documents/RomiRoadFollow/Deployment
-    mv $HOME/.cache/blobconverter/simple_frozen_graph_openvino_2021.4_6shave.blob simple_frozen_graph.blob
+which is the file that will be deployed to the Romi.  The conversion script will move this file into the *Deployment* directory.

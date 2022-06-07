@@ -49,7 +49,7 @@ def main(args, frc_config):
     camRgb.setPreviewSize(200, 200)
     camRgb.setBoardSocket(dai.CameraBoardSocket.RGB)
     camRgb.setResolution(dai.ColorCameraProperties.SensorResolution.THE_1080_P)
-    camRgb.setInterleaved(False)
+    camRgb.setInterleaved(True)
     camRgb.setColorOrder(dai.ColorCameraProperties.ColorOrder.RGB)
 
     # Linking

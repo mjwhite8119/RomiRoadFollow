@@ -54,5 +54,5 @@ blob_path = blobconverter.from_tf(
 home = os.path.expanduser('~')
 sourceFile = f"{home}/.cache/blobconverter/simple_frozen_graph_openvino_2021.4_6shave.blob"
 print(sourceFile)
-destinationFile = "simple_frozen_graph.blob"
+destinationFile = "../Deployment/simple_frozen_graph.blob"
 shutil.move(sourceFile, destinationFile)

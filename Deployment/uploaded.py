@@ -89,8 +89,7 @@ def loop_and_detect(previewQueue, detectionNNQueue, networkTables, cvSource):
             #     cv2.FONT_HERSHEY_TRIPLEX, 0.4, color)
 
         if inDet is not None:
-            print(inDet.getAllLayerNames())
-            print(inDet.getLayerDataType("model/output/BiasAdd/Add"))
+            # print(inDet.getAllLayerNames())
             steeringData = inDet.getLayerFp16("model/output/BiasAdd/Add")
             xaxisRotate = round(steeringData[0], 2) * 2
             counter += 1

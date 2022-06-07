@@ -31,7 +31,7 @@ batch_size = 100
 logPath = os.path.join(os.getcwd(), 'tflog')
 tensorboard_callback = startTensorBoard(logPath)
 
-writer = tf.summary.create_file_writer("tflog/train/")     
+writer = tf.summary.create_file_writer("tflog/images/")     
 
 #### STEP 6 - DISPLAY IN TENSORBOARD
 step = 0

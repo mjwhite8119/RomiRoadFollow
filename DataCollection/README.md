@@ -4,6 +4,7 @@
 To deploy the data collection scripts on the Romi:
 
 - Start up the Romi, go to the Romi Web UI
+- Go to the *Vision Status* and stop any running service by clicking the *Down* button.
 - Make the file system *Writable*.
 - Go to *Application Section -> File Upload* and upload the `img_helpers.py` file.
 - Go to *Application Section -> Application* and select *Uploaded Python file*.
