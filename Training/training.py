@@ -19,9 +19,6 @@ print(data.head())
 #### STEP 2 - VISUALIZE AND BALANCE DATA
 data = balanceData(data,display=True)
 
-# View each image
-# draw_image_with_label(path, data)
-
 #### STEP 3 - PREPARE FOR PROCESSING
 imagesPath, steerings = loadData(path,data)
 print('Number of Path Created for Images ',len(imagesPath),len(steerings))
@@ -32,11 +29,7 @@ xTrain, xVal, yTrain, yVal = train_test_split(imagesPath, steerings,
 print('Total Training Images: ',len(xTrain))
 print('Total Validation Images: ',len(xVal))
 
-#### STEP 5 - AUGMENT DATA
-
-#### STEP 6 - PREPROCESS
-
-#### STEP 7 - CREATE MODEL
+#### STEP 5 - CREATE MODEL
 
 # Read the actual image
 indexed_data = data.iloc[0]
@@ -46,15 +39,13 @@ img = preProcess(img)
 
 # Use it for the model input shape
 model = createModelFunctional(img)
-# model = createRFModel(xTrain)
 model.summary()
 
-#### STEP 8 - LAUNCH TENSORBOARD
-batch_size = 100
+#### STEP 6 - LAUNCH TENSORBOARD
 logPath = os.path.join(os.getcwd(), 'tflog')
 tensorboard_callback = startTensorBoard(logPath)   
 
-#### STEP 9 - TRAINNING
+#### STEP 7 - TRAINNING
 training_batch_size = 100
 validation_batch_size = 50
 trainSteps = int(len(xTrain) / training_batch_size) + 1
@@ -67,11 +58,30 @@ history = model.fit(dataGen(xTrain, yTrain, training_batch_size, 1),
                             callbacks=[tensorboard_callback],
                             verbose=2)
 
-#### STEP 10 - SAVE THE KERAS H5 MODEL
+#### STEP 8 - SAVE THE KERAS H5 MODEL
 model.save('model.h5')
 print('Model Saved')
 
-#### STEP 11 - PLOT THE RESULTS
+#### STEP 9 - SHOW THE PREDICTIONS
+print('Running Predictions')
+writer = tf.summary.create_file_writer(f"{logPath}/images/")  
+
+step = 0
+num_epochs = 1
+class_names = ["steering"]
+
+for epoch in range(num_epochs):
+    train_batch = dataGen(xTrain, yTrain, training_batch_size, 1)
+    for batch_idx, (data, labels) in enumerate(train_batch):
+        figure = my_image_grid(data, labels)
+
+        with writer.as_default():
+            tf.summary.image(
+                "Visualize Images", plot_to_image(figure), step=step,
+            )
+            step += 1
+
+print("Predictions Ready")
 # plt.plot(history.history['loss'])
 # plt.plot(history.history['val_loss'])
 # plt.legend(['Training', 'Validation'])
